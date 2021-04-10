@@ -8,26 +8,25 @@ import com.example.shortening.dto.UrlDTO;
 import com.example.shortening.util.Base62Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockStatic;
 
 public class ShorteningServiceTest {
 
     private UrlShorteningService service;
     private final MemoryUrlMapRepository urlMapRepository = new MemoryUrlMapRepository();
     private final MemoryUrlCountRepository urlCountRepository = new MemoryUrlCountRepository();
-    @Mock
-    private Base62Util base62Util;
+
+    private String hostUrl = "localhost:8080/";
 
     @BeforeEach
     void setUp() {
-        service = new UrlShorteningService(urlMapRepository, urlCountRepository);
+        service = new UrlShorteningService(urlMapRepository, urlCountRepository, hostUrl);
     }
 
     @Test
@@ -50,7 +49,7 @@ public class ShorteningServiceTest {
 
         UrlDTO urlDTO = service.saveShortenUrl("https://en.wikipedia.org/wiki/URL_shortening");
         assertThat(urlDTO.getCount()).isEqualTo(1);
-        assertThat(urlDTO.getUrl().length()).isLessThanOrEqualTo(8);
+        assertThat(urlDTO.getUrl().length()).isLessThanOrEqualTo(hostUrl.length() + 8);
     }
 
     @Test
@@ -84,7 +83,7 @@ public class ShorteningServiceTest {
 
         UrlDTO urlDTO = service.saveShortenUrl("https://en.wikipedia.org/wiki/URL_shortening");
         assertThat(urlDTO.getCount()).isEqualTo(2);
-        assertThat(urlDTO.getUrl()).isEqualTo("As2sE");
+        assertThat(urlDTO.getUrl()).isEqualTo(hostUrl + "As2sE");
     }
 
     @Test

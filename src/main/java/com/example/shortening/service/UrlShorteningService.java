@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -22,18 +21,19 @@ public class UrlShorteningService {
 
     private final UrlCountRepository urlCountRepository;
 
-    @Value("${hostUrl}")
-    private String hostUrl;
+    private final String hostUrl;
 
-    public UrlShorteningService(UrlMapRepository urlMapRepository, UrlCountRepository urlCountRepository) {
+    public UrlShorteningService(UrlMapRepository urlMapRepository,
+                                UrlCountRepository urlCountRepository,
+                                @Value("${hostUrl}") String hostUrl) {
         this.urlMapRepository = urlMapRepository;
         this.urlCountRepository = urlCountRepository;
+        this.hostUrl = hostUrl;
     }
 
     @Transactional
     public UrlDTO saveShortenUrl(String originUrl) {
 
-        // validate
         String errors = UrlValidator.validate(originUrl);
         if(!errors.isEmpty()) {
             throw new RuntimeException(errors);
